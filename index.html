@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Machine-level factory energy intelligence from a single clamp sensor. Yuva Yodha Energy Tech Hackathon 2026, Smart Manufacturing.">
+<meta property="og:title" content="OneMeter">
+<meta property="og:description" content="One clamp. Every machine. No rewiring.">
+<meta property="og:type" content="website">
+<title>OneMeter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F1F2F2;
+  --card:#FFFFFF;
+  --ink:#0F0E12;
+  --g1:#E5E5E5;
+  --g2:#CFCFCF;
+  --g3:#B2B2B2;
+  --g4:#7F7F7F;
+  --g5:#4D4D4D;
+  --g6:#272727;
+  --accent:#F05A24;
+  --sans:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 64px}
+
+.lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:lowercase;color:var(--g4)}
+.rule{height:1px;background:var(--ink);opacity:.14}
+
+/* ---------------- masthead ---------------- */
+.mast{display:flex;justify-content:space-between;align-items:flex-end;padding:26px 0 12px;gap:24px;flex-wrap:wrap}
+.mast .id{font-family:var(--mono);font-size:11px;letter-spacing:.2em;font-weight:600}
+.mast .id b{color:var(--accent);font-weight:600}
+
+/* ---------------- hero ---------------- */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:52px 0 56px}
+@media(max-width:860px){.hero{grid-template-columns:1fr;gap:34px;padding:34px 0}}
+.hero h1{
+  font-size:clamp(40px,6.4vw,74px);line-height:.93;letter-spacing:-.045em;
+  font-weight:800;margin:14px 0 22px;text-transform:lowercase;text-wrap:balance;
+}
+.hero h1 em{font-style:normal;color:var(--g3)}
+.hero p{font-size:15.5px;line-height:1.62;color:var(--g5);max-width:42ch;margin:0 0 28px}
+.specs{display:flex;gap:0;border-top:1px solid rgba(15,14,18,.14);flex-wrap:wrap}
+.spec{padding:14px 26px 0 0;margin-right:26px;border-right:1px solid rgba(15,14,18,.14)}
+.spec:last-child{border-right:0;margin-right:0}
+.spec .k{font-family:var(--mono);font-size:9px;letter-spacing:.13em;color:var(--g4);margin-bottom:7px}
+.spec .v{font-family:var(--mono);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.spec .v.strike{color:var(--g3);text-decoration:line-through;text-decoration-thickness:1px}
+.spec .v.hot{color:var(--accent)}
+
+/* ---------------- section head ---------------- */
+.sh{display:flex;justify-content:space-between;align-items:baseline;gap:20px;margin:0 0 16px;flex-wrap:wrap}
+.sh h2{font-size:14px;font-weight:700;margin:0;text-transform:lowercase;letter-spacing:-.005em}
+.sec{padding-top:38px}
+
+/* ---------------- panels ---------------- */
+.panel{background:var(--card);border:1px solid var(--g1)}
+.p-head{padding:15px 18px;border-bottom:1px solid var(--g1);display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.p-head h3{font-size:12.5px;font-weight:700;margin:0;text-transform:lowercase}
+.p-body{padding:17px 18px 19px}
+
+/* ---------------- split chart ---------------- */
+.splitbar{display:flex;justify-content:space-between;padding:14px 18px 0;gap:16px;flex-wrap:wrap}
+.splitbar .side{font-family:var(--mono);font-size:10px;letter-spacing:.11em;color:var(--g4)}
+.splitbar .side b{color:var(--ink);font-weight:600}
+canvas{display:block;width:100%}
+#c{height:360px}
+.legend{display:flex;flex-wrap:wrap;gap:0 20px;padding:13px 18px 16px;border-top:1px solid var(--g1)}
+.legend span{font-family:var(--mono);font-size:10px;color:var(--g5);display:flex;align-items:center;gap:7px}
+.legend i{width:9px;height:9px;display:block;flex:none}
+.legend span.hot{color:var(--accent);font-weight:500}
+
+/* ---------------- devices ---------------- */
+.devs{display:flex;gap:44px;align-items:flex-end;overflow-x:auto;padding:8px 2px 14px}
+.mbp{flex:none;width:712px}
+.mbp .lid{background:#C9CACB;border-radius:13px;padding:11px 11px 12px;box-shadow:0 1px 0 #fff inset}
+.mbp .bezel{background:#0B0B0D;border-radius:4px;padding:15px 5px 5px;position:relative}
+.mbp .cam{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:76px;height:5px;background:#1b1b1e;border-radius:3px}
+.mbp .screen{width:100%;height:425px;overflow:hidden;background:var(--paper);position:relative}
+.mbp .scale{width:1360px;transform:scale(.5);transform-origin:top left}
+.mbp .hinge{height:9px;background:linear-gradient(#B7B8B9,#96979A);border-radius:0 0 4px 4px;margin:0 30px}
+.mbp .base{height:7px;background:linear-gradient(#ACADAF,#7E7F82);border-radius:0 0 11px 11px;margin:0 -16px;position:relative}
+.mbp .base::after{content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);width:108px;height:4px;background:#8A8B8E;border-radius:0 0 5px 5px}
+
+.iph{flex:none;width:306px}
+.iph .body{background:#0B0B0D;border-radius:38px;padding:9px}
+.iph .screen{background:var(--paper);border-radius:30px;overflow:hidden;height:606px;position:relative}
+.iph .island{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:84px;height:23px;background:#0B0B0D;border-radius:12px;z-index:4}
+.devcap{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;color:var(--g4);margin-top:14px}
+
+/* mini dashboard inside laptop */
+.mini{padding:24px 28px;font-size:13px}
+.mini .top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid rgba(15,14,18,.14);padding-bottom:15px;margin-bottom:17px}
+.mini .brand{font-size:25px;font-weight:800;letter-spacing:-.035em;text-transform:lowercase}
+.mini .brand span{color:var(--accent)}
+.mini .ros{display:flex;gap:32px}
+.mini .ro .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--g4);margin-bottom:6px}
+.mini .ro .v{font-family:var(--mono);font-size:21px;font-weight:600;font-variant-numeric:tabular-nums}
+.mini .ro .v.hot{color:var(--accent)}
+.mini .row2{display:grid;grid-template-columns:1.42fr 1fr;gap:16px;margin-top:16px}
+#c2{height:280px}
+
+/* phone content */
+.ph{padding:44px 20px 20px;height:100%;display:flex;flex-direction:column;background:var(--paper)}
+.ph .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.ph .hd .nm{font-size:17px;font-weight:800;letter-spacing:-.03em;text-transform:lowercase}
+.ph .hd .nm span{color:var(--accent)}
+.ph .hd .t{font-family:var(--mono);font-size:10px;color:var(--g4)}
+.ph .flag{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;color:var(--accent);margin-bottom:9px}
+.ph h4{font-size:25px;font-weight:800;letter-spacing:-.035em;margin:0 0 4px;text-transform:lowercase;line-height:1.05}
+.ph .big{font-family:var(--mono);font-size:38px;font-weight:600;color:var(--accent);letter-spacing:-.03em;margin:14px 0 2px;font-variant-numeric:tabular-nums}
+.ph .bsub{font-family:var(--mono);font-size:10px;color:var(--g4);letter-spacing:.06em;margin-bottom:18px}
+.ph .card{background:var(--card);border:1px solid var(--g1);padding:14px;margin-bottom:12px}
+.ph .card p{font-size:12.5px;line-height:1.55;color:var(--g5);margin:0}
+.ph .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;padding:8px 0;border-bottom:1px solid var(--g1)}
+.ph .row:last-child{border-bottom:0}
+.ph .row b{font-weight:600;font-variant-numeric:tabular-nums}
+.ph .row b.hot{color:var(--accent)}
+.ph .btn{margin-top:auto;background:var(--accent);color:#fff;text-align:center;padding:15px;font-family:var(--mono);font-size:11px;letter-spacing:.13em;font-weight:600}
+.ph .btn2{text-align:center;padding:13px;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;color:var(--g4)}
+
+/* ---------------- ledger ---------------- */
+.grid{display:grid;grid-template-columns:1.34fr 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse}
+th{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--g4);font-weight:500;text-align:right;padding:0 0 11px}
+th:first-child{text-align:left}
+td{padding:9px 0;border-top:1px solid var(--g1);font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--g5)}
+td:first-child{text-align:left}
+tr.flagged td{background:rgba(240,90,36,.05)}
+.mname{display:flex;align-items:center;gap:9px;font-family:var(--sans);font-size:12.5px;color:var(--ink);font-weight:500}
+.mname i{width:3px;height:17px;flex:none;display:block}
+td.kw{color:var(--ink);font-weight:600}
+.drift.up{color:var(--accent);font-weight:600}
+.drift.flat,.drift.dn{color:var(--g3)}
+
+/* ---------------- drift ---------------- */
+.callout{border-left:2px solid var(--accent);padding:1px 0 1px 13px;margin-bottom:17px}
+.callout .h{font-size:13.5px;font-weight:700;margin-bottom:5px;letter-spacing:-.012em}
+.callout .p{font-size:12px;line-height:1.55;color:var(--g5);max-width:45ch}
+.kvs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--g1);border:1px solid var(--g1);margin-top:14px}
+.kv{background:var(--card);padding:11px 13px}
+.kv .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;color:var(--g4);margin-bottom:6px}
+.kv .v{font-family:var(--mono);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.kv .v.hot{color:var(--accent)}
+
+/* ---------------- scheduler ---------------- */
+.slabs{display:flex;gap:2px;margin-bottom:6px}
+.slab{font-family:var(--mono);font-size:8px;letter-spacing:.09em;color:var(--g4);padding:3px 0;text-align:center;border-top:2px solid var(--g2)}
+.slab.pk{color:var(--accent);border-color:var(--accent)}
+.sched{position:relative;height:152px;display:flex;align-items:flex-end;gap:2px;margin:24px 0 8px}
+.bar{flex:1;position:relative;height:100%}
+.bar .before{position:absolute;left:0;right:0;bottom:0;background:var(--g1)}
+.bar .after{position:absolute;left:0;right:0;bottom:0;background:var(--g5)}
+.bar.pk .after{background:var(--accent)}
+.contract{position:absolute;left:0;right:0;border-top:1px dashed var(--accent)}
+.contract span{position:absolute;right:0;top:-15px;background:var(--card);padding-left:8px;font-family:var(--mono);font-size:9px;letter-spacing:.09em;color:var(--accent)}
+.axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--g4);margin-bottom:15px}
+.lg2{display:flex;gap:18px;flex-wrap:wrap}
+.lg2 span{font-family:var(--mono);font-size:10px;color:var(--g5);display:flex;align-items:center;gap:7px}
+.lg2 i{width:9px;height:9px;display:block;flex:none}
+
+footer{margin-top:42px;padding-top:16px;border-top:1px solid rgba(15,14,18,.14);font-family:var(--mono);font-size:10px;color:var(--g4);line-height:1.8;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+footer b{color:var(--g5);font-weight:500}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+  <div class="mast">
+    <div class="id">one<b>meter</b></div>
+    <div class="lab">single&#8209;point load disaggregation &nbsp;/&nbsp; yuva yodha 2026</div>
+  </div>
+  <div class="rule"></div>
+
+  <!-- ============ hero ============ -->
+  <div class="hero">
+    <div>
+      <div class="lab">the whole product</div>
+      <h1>one clamp.<br>every machine.<br><em>no rewiring.</em></h1>
+      <p>A factory has one meter, at the door. It reports a single number.
+         We clip one sensor around one cable and recover what every machine
+         behind it is drawing — second by second.</p>
+      <div class="specs">
+        <div class="spec"><div class="k">onemeter</div><div class="v hot">₹1,500</div></div>
+        <div class="spec"><div class="k">sub&#8209;metering 30 machines</div><div class="v strike">₹6,00,000</div></div>
+        <div class="spec"><div class="k">install</div><div class="v">0 min</div></div>
+        <div class="spec"><div class="k">downtime</div><div class="v">none</div></div>
+      </div>
+    </div>
+    <div id="clamp"></div>
+  </div>
+
+  <!-- ============ split ============ -->
+  <div class="sec">
+    <div class="sh">
+      <h2>the same second, read two ways</h2>
+      <span class="lab">live &nbsp;/&nbsp; 260 samples &nbsp;/&nbsp; 1 hz</span>
+    </div>
+    <div class="panel">
+      <div class="splitbar">
+        <div class="side"><b>above</b> — what the utility meter sees. one channel.</div>
+        <div class="side"><b>below</b> — what onemeter sees. six machines.</div>
+      </div>
+      <canvas id="c"></canvas>
+      <div class="legend"></div>
+    </div>
+  </div>
+
+  <!-- ============ devices ============ -->
+  <div class="sec">
+    <div class="sh">
+      <h2>on the desk, and on the floor</h2>
+      <span class="lab">browser &nbsp;/&nbsp; ios</span>
+    </div>
+    <div class="devs">
+      <div class="mbp">
+        <div class="lid">
+          <div class="bezel">
+            <div class="cam"></div>
+            <div class="screen">
+              <div class="scale">
+                <div class="mini">
+                  <div class="top">
+                    <div class="brand">one<span>meter</span></div>
+                    <div class="ros">
+                      <div class="ro"><div class="k">live load</div><div class="v" id="m-kw">—</div></div>
+                      <div class="ro"><div class="k">apparent</div><div class="v" id="m-kva">—</div></div>
+                      <div class="ro"><div class="k">max demand</div><div class="v hot">78.4 kVA</div></div>
+                      <div class="ro"><div class="k">recoverable</div><div class="v">₹4.68 L/yr</div></div>
+                    </div>
+                  </div>
+
+                  <div class="panel">
+                    <div class="splitbar">
+                      <div class="side"><b>above</b> — what the utility meter sees. one channel.</div>
+                      <div class="side"><b>below</b> — what onemeter sees. six machines.</div>
+                    </div>
+                    <canvas id="c2"></canvas>
+                    <div class="legend"></div>
+                  </div>
+
+                  <div class="row2">
+                    <div class="panel">
+                      <div class="p-head"><h3>machine ledger</h3><span class="lab">today 06:00–14:31</span></div>
+                      <div class="p-body">
+                        <table>
+                          <thead><tr>
+                            <th>machine</th><th>last 30 min</th><th>live kw</th>
+                            <th>kwh today</th><th>share</th><th>kwh / unit</th>
+                          </tr></thead>
+                          <tbody class="ledger-body"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="panel">
+                      <div class="p-head"><h3>load schedule · tomorrow</h3><span class="lab">msedcl ht‑i</span></div>
+                      <div class="p-body">
+                        <div class="slabs"></div>
+                        <div class="sched"><div class="contract"><span>75 kVA</span></div></div>
+                        <div class="axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div>
+                        <div class="lg2">
+                          <span><i style="background:var(--g1)"></i>current</span>
+                          <span><i style="background:var(--g5)"></i>optimised</span>
+                          <span style="color:var(--accent)">saves ₹31,400/mo</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hinge"></div>
+        </div>
+        <div class="base"></div>
+        <div class="devcap">plant view — any browser, no install</div>
+      </div>
+
+      <div class="iph">
+        <div class="body">
+          <div class="screen">
+            <div class="island"></div>
+            <div class="ph">
+              <div class="hd">
+                <div class="nm">one<span>meter</span></div>
+                <div class="t">14:31</div>
+              </div>
+              <div class="flag">efficiency alert</div>
+              <h4>air compressor</h4>
+              <div class="big">+14.1%</div>
+              <div class="bsub">kwh per unit vs july baseline</div>
+              <div class="card">
+                <p>Six straight weeks of drift while output held flat.
+                   Signature matches a fouled intake filter or a leaking
+                   discharge valve. Not a breakdown yet.</p>
+              </div>
+              <div class="card" style="padding:4px 14px">
+                <div class="row"><span>baseline</span><b>0.412</b></div>
+                <div class="row"><span>current</span><b class="hot">0.470</b></div>
+                <div class="row"><span>wasted / yr</span><b class="hot">₹41,200</b></div>
+                <div class="row"><span>fix cost</span><b>₹2,800</b></div>
+              </div>
+              <div class="btn">assign to maintenance</div>
+              <div class="btn2">snooze 7 days</div>
+            </div>
+          </div>
+        </div>
+        <div class="devcap">supervisor alert — push, in the local language</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ledger + drift ============ -->
+  <div class="sec grid">
+    <div class="panel">
+      <div class="p-head"><h3>machine ledger</h3><span class="lab">today &nbsp;06:00–14:31</span></div>
+      <div class="p-body">
+        <table>
+          <thead><tr>
+            <th>machine</th><th>last 30 min</th><th>live kw</th>
+            <th>kwh today</th><th>share</th><th>kwh / unit</th>
+          </tr></thead>
+          <tbody class="ledger-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="p-head"><h3>efficiency drift</h3><span class="lab">air compressor</span></div>
+      <div class="p-body">
+        <div class="callout">
+          <div class="h">14% more power per unit than in July</div>
+          <div class="p">Found from the energy signature alone — no vibration sensor,
+             no second device on the machine.</div>
+        </div>
+        <div id="driftchart"></div>
+        <div class="kvs">
+          <div class="kv"><div class="k">baseline · jul</div><div class="v">0.412</div></div>
+          <div class="kv"><div class="k">current</div><div class="v hot">0.470</div></div>
+          <div class="kv"><div class="k">wasted / yr</div><div class="v hot">₹41,200</div></div>
+          <div class="kv"><div class="k">fix cost</div><div class="v">₹2,800</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ scheduler ============ -->
+  <div class="sec">
+    <div class="panel">
+      <div class="p-head"><h3>load schedule · tomorrow</h3><span class="lab">msedcl ht&#8209;i &nbsp;/&nbsp; time&#8209;of&#8209;day slabs</span></div>
+      <div class="p-body">
+        <div class="slabs" id="slabs"></div>
+        <div class="sched" id="sched"><div class="contract"><span>contract demand 75 kVA</span></div></div>
+        <div class="axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div>
+        <div class="lg2">
+          <span><i style="background:var(--g1)"></i>current — peaks at 78.4 kVA</span>
+          <span><i style="background:var(--g5)"></i>optimised — furnace and compressor moved off&#8209;peak</span>
+          <span><i style="background:var(--accent)"></i>peak tariff hours</span>
+          <span style="color:var(--accent)">saves ₹31,400/mo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div><b>Illustrative data.</b> Machine profiles modelled on the HIPE open industrial dataset (KIT Karlsruhe). Not live plant data.</div>
+    <div>smart manufacturing</div>
+  </footer>
+</div>
+
+<script>
+/* palette: five greys carry identity, orange is reserved for the one machine
+   that needs attention. */
+const M = [
+  {id:'furnace', name:'Induction Furnace', c:'#4D4D4D', sec:'1.84',  d:'+0.2%',  dc:'flat'},
+  {id:'comp',    name:'Air Compressor',    c:'#F05A24', sec:'0.470', d:'+14.1%', dc:'up', flag:1},
+  {id:'cnc',     name:'CNC Lathe',         c:'#7F7F7F', sec:'0.216', d:'-1.8%',  dc:'dn'},
+  {id:'press',   name:'Hydraulic Press',   c:'#B2B2B2', sec:'0.098', d:'+0.9%',  dc:'flat'},
+  {id:'blower',  name:'Exhaust Blower',    c:'#CFCFCF', sec:'—',     d:'—',      dc:'flat'},
+  {id:'aux',     name:'Lighting + Aux',    c:'#E5E5E5', sec:'—',     d:'—',      dc:'flat'}
+];
+const KWH = [412.6, 188.3, 96.4, 41.2, 27.8, 18.1];
+const N = 260, MAXT = 84;
+const hist = M.map(()=>[]);
+let tick = 0;
+const st = {compOn:false, compT:0, pressT:0, cnc:7.5};
+
+function sample(i){
+  const t = i*0.1, cyc = (i%210)/210;
+  const furnace = cyc>0.86 ? 2.5+Math.sin(i*0.4)*0.5 : 29+Math.sin(t*0.55)*7.5+Math.sin(t*1.9)*1.6;
+  if(st.compT-- <= 0){ st.compOn=!st.compOn; st.compT = st.compOn ? 26+Math.random()*14 : 17+Math.random()*12; }
+  const comp = st.compOn ? 15.2+Math.random()*0.7 : 0.4;
+  st.cnc += (Math.random()-0.5)*1.5; st.cnc = Math.max(3.8,Math.min(11.5,st.cnc));
+  st.pressT--;
+  if(st.pressT < -30 && Math.random()<0.09) st.pressT = 3;
+  const press = st.pressT>0 ? 8.4+Math.random()*0.6 : 0.9;
+  return [furnace, comp, st.cnc, press, 3.2+Math.random()*0.25, 2.1+Math.random()*0.12];
+}
+for(let i=0;i<N;i++){ sample(tick++).forEach((v,j)=>hist[j].push(v)); }
+
+/* ---- chart ---- */
+function setup(cv){
+  /* offsetWidth, not getBoundingClientRect: the laptop mockup scales its
+     content by .5 and a rect would report the transformed size. */
+  const w = cv.offsetWidth, h = cv.offsetHeight, d = window.devicePixelRatio||1;
+  cv.width = Math.round(w*d); cv.height = Math.round(h*d);
+  const x = cv.getContext('2d'); x.setTransform(d,0,0,d,0,0);
+  return {ctx:x, W:w, H:h};
+}
+function render(cv, o){
+  const {ctx,W,H} = setup(cv);
+  const PL=52, PR=18, GAP=o.gap, TOP=o.top;
+  const plotW = W-PL-PR, topY=o.padTop, botY=topY+TOP+GAP, botH=H-botY-22;
+  const tot=[]; for(let i=0;i<N;i++){let s=0;for(let j=0;j<6;j++)s+=hist[j][i];tot.push(s);}
+  const X = i => PL+(i/(N-1))*plotW;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
+  ctx.font='500 9.5px "IBM Plex Mono", monospace'; ctx.textBaseline='middle';
+
+  /* faint horizontal grid */
+  ctx.strokeStyle='#E5E5E5'; ctx.lineWidth=1;
+  [0,.5,1].forEach(f=>{const y=topY+TOP*f;ctx.beginPath();ctx.moveTo(PL,y);ctx.lineTo(W-PR,y);ctx.stroke();});
+
+  /* top — aggregate, black */
+  const ty = v => topY+TOP-(v/MAXT)*TOP;
+  ctx.beginPath(); ctx.moveTo(X(0),ty(tot[0]));
+  for(let i=1;i<N;i++) ctx.lineTo(X(i),ty(tot[i]));
+  ctx.strokeStyle='#0F0E12'; ctx.lineWidth=1.5; ctx.stroke();
+
+  ctx.fillStyle='#7F7F7F'; ctx.textAlign='right';
+  ctx.fillText(MAXT+' kW', PL-12, topY); ctx.fillText('0', PL-12, topY+TOP);
+
+  /* divider */
+  ctx.strokeStyle='#CFCFCF';
+  const mid = topY+TOP+GAP/2-2;
+  ctx.beginPath(); ctx.moveTo(PL,mid); ctx.lineTo(W-PR,mid); ctx.stroke();
+
+  /* bottom — stacked greys, orange band for the flagged machine */
+  const by = v => botY+botH-(v/MAXT)*botH;
+  const acc = new Array(N).fill(0);
+  for(let j=M.length-1;j>=0;j--){
+    const low = acc.slice();
+    for(let i=0;i<N;i++) acc[i]+=hist[j][i];
+    ctx.beginPath(); ctx.moveTo(X(0),by(acc[0]));
+    for(let i=1;i<N;i++) ctx.lineTo(X(i),by(acc[i]));
+    for(let i=N-1;i>=0;i--) ctx.lineTo(X(i),by(low[i]));
+    ctx.closePath(); ctx.fillStyle=M[j].c; ctx.fill();
+    ctx.strokeStyle='#FFFFFF'; ctx.lineWidth=0.7; ctx.stroke();
+  }
+  ctx.fillStyle='#7F7F7F'; ctx.textAlign='right';
+  ctx.fillText(MAXT+' kW', PL-12, botY); ctx.fillText('0', PL-12, botY+botH);
+
+  /* peak annotation, anchored to the real maximum in view */
+  if(o.annotate){
+    let pk=0; for(let i=1;i<N;i++) if(tot[i]>tot[pk]) pk=i;
+    const px=X(pk);
+    ctx.strokeStyle='#F05A24'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(px,ty(tot[pk])); ctx.lineTo(px,botY+botH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(px,ty(tot[pk]),3,0,7); ctx.fillStyle='#F05A24'; ctx.fill();
+    const txt = tot[pk].toFixed(1)+' kW — furnace + compressor overlap';
+    ctx.font='500 10px "IBM Plex Mono", monospace';
+    const w = ctx.measureText(txt).width;
+    const lx = Math.min(px+11, W-PR-w-9);
+    ctx.fillStyle='#FFFFFF'; ctx.fillRect(lx-7,topY-5,w+14,19);
+    ctx.strokeStyle='#F05A24'; ctx.lineWidth=1; ctx.strokeRect(lx-7,topY-5,w+14,19);
+    ctx.fillStyle='#F05A24'; ctx.textAlign='left'; ctx.fillText(txt,lx,topY+5);
+  }
+  return tot[N-1];
+}
+
+function drawAll(){
+  const now = render(document.getElementById('c'), {padTop:26,top:78,gap:44,annotate:true});
+  render(document.getElementById('c2'), {padTop:24,top:70,gap:38,annotate:true});
+  document.getElementById('m-kw').textContent  = now.toFixed(1)+' kW';
+  document.getElementById('m-kva').textContent = (now/0.94).toFixed(1)+' kVA';
+}
+window.addEventListener('resize', drawAll);
+
+/* ---- clamp illustration: split-core CT, orthographic, one orange detail ---- */
+document.getElementById('clamp').innerHTML = `
+<svg viewBox="0 0 400 330" width="100%" role="img"
+     aria-label="Split-core current clamp closed around a single live cable">
+  <line x1="200" y1="8" x2="200" y2="52" stroke="#B2B2B2" stroke-width="15" stroke-linecap="round"/>
+  <line x1="200" y1="112" x2="200" y2="150" stroke="#B2B2B2" stroke-width="15" stroke-linecap="round"/>
+  <line x1="200" y1="8" x2="200" y2="52" stroke="#E5E5E5" stroke-width="5" stroke-linecap="round"/>
+  <line x1="200" y1="112" x2="200" y2="150" stroke="#E5E5E5" stroke-width="5" stroke-linecap="round"/>
+
+  <path d="M200 30 a52 52 0 0 1 0 104 a52 52 0 0 1 0 -104 Z"
+        fill="none" stroke="#0F0E12" stroke-width="15"/>
+  <path d="M200 30 a52 52 0 0 1 0 104" fill="none" stroke="#4D4D4D" stroke-width="15"/>
+  <circle cx="200" cy="30" r="3.4" fill="#F05A24"/>
+  <circle cx="200" cy="134" r="3.4" fill="#F05A24"/>
+
+  <rect x="163" y="146" width="74" height="104" rx="9" fill="#0F0E12"/>
+  <rect x="171" y="158" width="58" height="30" rx="3" fill="#272727"/>
+  <rect x="177" y="166" width="46" height="3" rx="1.5" fill="#7F7F7F"/>
+  <rect x="177" y="174" width="30" height="3" rx="1.5" fill="#4D4D4D"/>
+  <rect x="171" y="200" width="58" height="9" rx="4.5" fill="#F05A24"/>
+  <rect x="171" y="218" width="58" height="20" rx="3" fill="#272727"/>
+
+  <path d="M200 250 v30 q0 16 -18 16 h-46" fill="none" stroke="#0F0E12" stroke-width="7" stroke-linecap="round"/>
+  <rect x="106" y="288" width="32" height="16" rx="4" fill="#4D4D4D"/>
+  <rect x="94"  y="292" width="16" height="8"  rx="3" fill="#B2B2B2"/>
+
+  <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#7F7F7F" letter-spacing="1.2">
+    <line x1="256" y1="82" x2="300" y2="82" stroke="#CFCFCF" stroke-width="1"/>
+    <text x="306" y="85">live cable</text>
+    <line x1="245" y1="170" x2="300" y2="170" stroke="#CFCFCF" stroke-width="1"/>
+    <text x="306" y="173">esp32</text>
+    <line x1="100" y1="204" x2="155" y2="204" stroke="#CFCFCF" stroke-width="1"/>
+    <text x="14" y="207">split core</text>
+    <text x="14" y="322" fill="#0F0E12" font-size="10">sct&#8209;013 &nbsp;/&nbsp; 100 a &nbsp;/&nbsp; clip&#8209;on</text>
+  </g>
+</svg>`;
+
+/* ---- ledger ---- */
+function spark(v,c){
+  const w=64,h=17,mx=Math.max(...v),mn=Math.min(...v),rg=(mx-mn)||1;
+  const p=v.map((q,i)=>`${(i/(v.length-1)*w).toFixed(1)},${(h-((q-mn)/rg)*(h-2)-1).toFixed(1)}`).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true" style="display:block">
+    <polyline points="${p}" fill="none" stroke="${c}" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
+}
+function ledger(){
+  const tot = KWH.reduce((a,b)=>a+b,0);
+  const rows = M.map((m,j)=>`
+    <tr class="${m.flag?'flagged':''}">
+      <td><div class="mname"><i style="background:${m.c}"></i>${m.name}</div></td>
+      <td>${spark(hist[j].slice(-70).filter((_,i)=>i%2===0), m.flag?'#F05A24':'#B2B2B2')}</td>
+      <td class="kw">${hist[j][N-1].toFixed(1)}</td>
+      <td>${KWH[j].toFixed(1)}</td>
+      <td>${(KWH[j]/tot*100).toFixed(1)}%</td>
+      <td>${m.sec} <span class="drift ${m.dc}">${m.d}</span></td>
+    </tr>`).join('');
+  document.querySelectorAll('.ledger-body').forEach(el=>el.innerHTML=rows);
+}
+
+/* ---- drift chart ---- */
+(function(){
+  const v=[0.412,0.418,0.424,0.437,0.449,0.458,0.470], w=300,h=78,mn=0.400,mx=0.482;
+  const X=i=>i/(v.length-1)*(w-36)+2, Y=q=>h-15-((q-mn)/(mx-mn))*(h-26);
+  const ln=v.map((q,i)=>`${X(i).toFixed(1)},${Y(q).toFixed(1)}`).join(' ');
+  document.getElementById('driftchart').innerHTML=`
+  <svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img"
+       aria-label="Specific energy consumption rising from 0.412 to 0.470 kWh per unit over six weeks">
+    <line x1="2" y1="${Y(0.412)}" x2="${w-34}" y2="${Y(0.412)}" stroke="#B2B2B2" stroke-width="1" stroke-dasharray="3 3"/>
+    <polygon points="${ln} ${X(6).toFixed(1)},${h-15} 2,${h-15}" fill="#F05A24" fill-opacity=".1"/>
+    <polyline points="${ln}" fill="none" stroke="#F05A24" stroke-width="1.6"/>
+    <circle cx="${X(6)}" cy="${Y(0.470)}" r="3.2" fill="#F05A24"/>
+    <text x="${w-30}" y="${Y(0.412)+3.5}" fill="#7F7F7F" font-size="8.5" font-family="IBM Plex Mono, monospace">0.412</text>
+    <text x="${w-30}" y="${Y(0.470)+3.5}" fill="#F05A24" font-size="8.5" font-family="IBM Plex Mono, monospace">0.470</text>
+    <text x="2" y="${h-3}" fill="#7F7F7F" font-size="8.5" font-family="IBM Plex Mono, monospace">WEEK 27</text>
+    <text x="${w-62}" y="${h-3}" fill="#7F7F7F" font-size="8.5" font-family="IBM Plex Mono, monospace">WEEK 33</text>
+  </svg>`;
+})();
+
+/* ---- 24h scheduler ---- */
+(function(){
+  const before=[38,36,35,34,36,44,58,66,71,76,78,74,62,58,70,75,77,72,68,62,54,46,42,40];
+  const after =[52,54,56,55,54,58,60,62,64,66,68,66,58,56,62,66,68,64,60,56,58,60,58,54];
+  const pk = h => (h>=9&&h<12)||(h>=18&&h<22), MX=88;
+  const bars = before.map((b,h)=>`<div class="bar${pk(h)?' pk':''}">
+      <div class="before" style="height:${b/MX*100}%"></div>
+      <div class="after" style="height:${after[h]/MX*100}%"></div></div>`).join('');
+  document.querySelectorAll('.sched').forEach(el=>el.insertAdjacentHTML('beforeend',bars));
+  document.querySelectorAll('.contract').forEach(el=>el.style.bottom=(75/MX*100)+'%');
+  const slabHTML = [
+    ['off&#8209;peak 22–06',8,0],['normal 06–09',3,0],['peak 09–12',3,1],
+    ['normal 12–18',6,0],['peak 18–22',4,1]
+  ].map(([n,f,h])=>`<div class="slab${h?' pk':''}" style="flex:${f}">${n}</div>`).join('');
+  document.querySelectorAll('.slabs').forEach(el=>el.innerHTML=slabHTML);
+})();
+
+const legendHTML =
+  M.map(m=>`<span class="${m.flag?'hot':''}"><i style="background:${m.c}"></i>${m.name}${m.flag?' — drifting':''}</span>`).join('');
+document.querySelectorAll('.legend').forEach(el=>el.innerHTML=legendHTML);
+
+ledger(); drawAll();
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  setInterval(()=>{
+    sample(tick++).forEach((v,j)=>{ hist[j].push(v); hist[j].shift(); });
+    drawAll();
+    if(tick%12===0) ledger();
+  }, 620);
+}
+</script>
+
+</body>
+</html>
